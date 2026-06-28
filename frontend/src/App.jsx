@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Mic, Sparkles, BookOpen, AlertCircle, Check } from 'lucide-react';
 import Navbar from './components/navbar';
+import { GlassButton } from './components/GlassButton';
 
 // Skeleton Loader Component for Song Cards
 const SongCardSkeleton = () => (
@@ -93,20 +94,25 @@ function App() {
           </div>
           
           <div className="flex mt-4 space-x-4">
-            <button
+            <GlassButton
               onClick={handleSearch}
-              className="flex-1 py-3.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 active:scale-[0.98] transition-all text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/40 shadow-lg shadow-blue-600/20 disabled:opacity-50 flex items-center justify-center space-x-2"
+              className="flex-1 text-lg font-semibold text-white"
+              glassColor="rgba(37, 99, 235, 0.85)"
               disabled={isLoading}
             >
-              <Sparkles className="w-5 h-5" />
+              <Search className="w-5 h-5" />
               <span>Search Database</span>
-            </button>
-            <Link 
-              to="/audio-search" 
-              className="flex items-center justify-center px-6 bg-white/70 dark:bg-gray-900/40 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-white rounded-xl hover:bg-slate-50 dark:hover:bg-gray-800 active:scale-[0.98] transition-all focus:outline-none focus:ring-2 focus:ring-slate-200 dark:focus:ring-gray-500/30"
-            >
-              <Mic className="h-5 w-5 mr-2 text-blue-400" />
-              Voice Search
+            </GlassButton>
+            
+            <Link to="/audio-search" className="flex-1 flex">
+              <GlassButton
+                className="w-full text-lg font-semibold text-slate-800 dark:text-white"
+                glassColor="rgba(255, 255, 255, 0.15)"
+                type="button"
+              >
+                <Mic className="h-5 w-5 mr-2 text-blue-500 dark:text-blue-400" />
+                Voice Search
+              </GlassButton>
             </Link>
           </div>
         </div>
@@ -129,7 +135,7 @@ function App() {
         {/* Loading Skeletons State */}
         {isLoading && (
           <div className="w-full max-w-4xl mt-8">
-            <div className="flex items-center space-x-3 mb-6 bg-slate-100/60 dark:bg-gray-950/20 backdrop-blur-sm border border-slate-200 dark:border-white/5 p-4 rounded-xl max-w-sm shadow-md">
+            <div className="flex items-center space-x-3 mb-6 bg-slate-100/60 dark:bg-gray-955/20 backdrop-blur-sm border border-slate-200 dark:border-white/5 p-4 rounded-xl max-w-sm shadow-md">
               <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
               <h2 className="text-lg font-semibold text-blue-500">Searching lyric database...</h2>
             </div>
@@ -197,27 +203,31 @@ function App() {
             {/* Pagination Controls */}
             {results.ranked_results.length > resultsPerPage && (
               <div className="flex justify-between items-center mt-8">
-                <button
+                <GlassButton
                   onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                   disabled={currentPage === 1}
-                  className="px-5 py-2.5 bg-white/70 dark:bg-gray-900/40 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-white rounded-xl hover:bg-slate-50 dark:hover:bg-gray-800 disabled:opacity-30 disabled:pointer-events-none transition-all duration-200"
+                  className="text-slate-800 dark:text-white text-sm font-medium"
+                  size="sm"
+                  glassColor="rgba(255, 255, 255, 0.1)"
                 >
                   Previous
-                </button>
+                </GlassButton>
                 <span className="text-slate-500 dark:text-gray-400 text-sm font-medium">
                   Page {currentPage} of {Math.ceil(results.ranked_results.length / resultsPerPage)}
                 </span>
-                <button
+                <GlassButton
                   onClick={() =>
                     setCurrentPage((prev) =>
                       Math.min(prev + 1, Math.ceil(results.ranked_results.length / resultsPerPage))
                     )
                   }
                   disabled={currentPage === Math.ceil(results.ranked_results.length / resultsPerPage)}
-                  className="px-5 py-2.5 bg-white/70 dark:bg-gray-900/40 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-white rounded-xl hover:bg-slate-50 dark:hover:bg-gray-800 disabled:opacity-30 disabled:pointer-events-none transition-all duration-200"
+                  className="text-slate-800 dark:text-white text-sm font-medium"
+                  size="sm"
+                  glassColor="rgba(255, 255, 255, 0.1)"
                 >
                   Next
-                </button>
+                </GlassButton>
               </div>
             )}
           </div>

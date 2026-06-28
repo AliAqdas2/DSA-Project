@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Mic, ArrowLeft, Headphones, Sparkles, AlertCircle, CheckCircle } from 'lucide-react';
 import Navbar from './components/navbar';
+import { GlassButton } from './components/GlassButton';
 
 // Skeleton Loader Component for Song Cards
 const SongCardSkeleton = () => (
@@ -169,23 +170,21 @@ function AudioSearch() {
             </div>
 
             <div className="flex items-center justify-center gap-4 w-full mt-6">
-              <button
+              <GlassButton
                 onClick={isRecording ? stopRecording : startRecording}
-                className={`flex-1 py-3.5 px-6 rounded-xl text-lg font-semibold transition-all duration-250 active:scale-[0.98] ${
-                  isRecording 
-                    ? 'bg-red-600 hover:bg-red-700 text-white shadow-lg shadow-red-600/30 animate-pulse ring-4 ring-red-500/20' 
-                    : 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/20'
-                }`}
+                className={`flex-1 text-lg font-semibold text-white ${isRecording ? 'animate-pulse' : ''}`}
+                glassColor={isRecording ? 'rgba(220, 38, 38, 0.85)' : 'rgba(37, 99, 235, 0.85)'}
               >
                 {isRecording ? 'Stop & Search' : 'Start Recording'}
-              </button>
-              <button
+              </GlassButton>
+              <GlassButton
                 onClick={() => window.history.back()}
-                className="px-6 py-3.5 bg-white/70 dark:bg-gray-900/40 border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-gray-800 text-slate-800 dark:text-white rounded-xl font-medium transition-all active:scale-[0.98] flex items-center"
+                className="text-slate-800 dark:text-white font-medium"
+                glassColor="rgba(255, 255, 255, 0.15)"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Go Back
-              </button>
+              </GlassButton>
             </div>
           </div>
         )}

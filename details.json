@@ -26,5 +26,12 @@
         "doc_id": 4,
         "artists": "Unknown",
         "album_name": "Unknown"
+    },
+    {
+        "spotify_id": "123",
+        "name": "Test Song",
+        "doc_id": 5,
+        "artists": "Tester",
+        "album_name": "Test Album"
     }
 ]

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Music, Link as LinkIcon, Users, Disc, FileText, CheckCircle } from 'lucide-react';
 import Navbar from './components/navbar';
+import { GlassButton } from './components/GlassButton';
 
 export default function AddSongForm() {
   const [formData, setFormData] = useState({
@@ -203,9 +204,10 @@ export default function AddSongForm() {
             />
           </div>
 
-          <button
+          <GlassButton
             type="submit"
-            className="w-full p-3.5 bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white rounded-xl font-semibold transition-all shadow-lg shadow-blue-600/20 disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center space-x-2"
+            className="w-full font-semibold text-white"
+            glassColor="rgba(37, 99, 235, 0.85)"
             disabled={isLoading}
           >
             {isLoading ? (
@@ -216,7 +218,7 @@ export default function AddSongForm() {
             ) : (
               <span>Add Song to Index</span>
             )}
-          </button>
+          </GlassButton>
         </form>
 
         {error && (
