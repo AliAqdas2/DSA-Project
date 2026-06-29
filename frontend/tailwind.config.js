@@ -69,7 +69,7 @@ export default {
         "gutter": "24px",
         "unit": "4px",
         "margin-desktop": "40px",
-        "container-max": "1100px",
+        "container-max": "1200px",
         "stack-sm": "8px"
       },
       fontFamily: {

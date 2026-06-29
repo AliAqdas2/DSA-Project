@@ -220,7 +220,7 @@ function App() {
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                       {paginatedResults.map(([details], index) => {
                         const cleanSpotifyId = details.spotify_id
                           ? details.spotify_id.replace(/['"]+/g, '').trim()
@@ -247,11 +247,12 @@ function App() {
                             </div>
 
                             {cleanSpotifyId ? (
-                              <div className="w-full bg-[#E2E1DC] relative overflow-hidden rounded-[2px] border border-[#E2E1DC]">
+                              <div className="w-full h-[354px] bg-[#E2E1DC] relative overflow-hidden rounded-[2px] border border-[#E2E1DC]">
                                 <iframe
                                   src={`https://open.spotify.com/embed/track/${cleanSpotifyId}`}
                                   width="100%"
                                   height="352"
+                                  scrolling="no"
                                   allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                                   className="border-0 w-full"
                                   style={{ border: 'none', overflow: 'hidden', minWidth: '100%', maxWidth: '100%' }}
