@@ -2273,5 +2273,12 @@
         "artists": "['SADBOYMUSIC']",
         "album_name": "gouttée",
         "spotify_id": "3aNZhXGjTg17LRS7u9z85e"
+    },
+    {
+        "spotify_id": "1yPsIkp1a6VjM8Ppy1mXj2",
+        "name": "Beautiful Day",
+        "doc_id": 326,
+        "artists": "U2",
+        "album_name": "All That You Can't Leave Behind"
     }
 ]

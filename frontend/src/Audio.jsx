@@ -1,26 +1,21 @@
-import { useState, useEffect, useRef } from 'react';
-import { Mic, ArrowLeft, Headphones, Sparkles, AlertCircle, CheckCircle } from 'lucide-react';
-import { Application } from '@splinetool/runtime';
+import { useState, useEffect } from 'react';
 import Navbar from './components/navbar';
-import { GlassButton } from './components/GlassButton';
 
-// Skeleton Loader Component for Song Cards
 const SongCardSkeleton = () => (
-  <div className="bg-white/70 dark:bg-gray-900/40 backdrop-blur-md border border-slate-200 dark:border-white/5 p-4 rounded-2xl shadow-md dark:shadow-lg animate-pulse flex flex-col justify-between h-[510px] min-w-0 overflow-hidden">
-    <div>
-      <div className="h-6 bg-slate-200 dark:bg-gray-800/60 rounded-md w-3/4 mb-3"></div>
-      <div className="h-4 bg-slate-200/80 dark:bg-gray-800/40 rounded-md w-1/2 mb-2"></div>
-      <div className="h-4 bg-slate-200/80 dark:bg-gray-800/40 rounded-md w-2/3 mb-4"></div>
+  <div className="song-card hairline-all p-4 flex flex-col gap-4 animate-pulse rounded-[4px] bg-[#F7F6F3] min-w-0">
+    <div className="flex flex-col gap-2 min-h-[72px]">
+      <div className="h-6 bg-[#E2E1DC] rounded-sm w-3/4"></div>
+      <div className="h-4 bg-[#E2E1DC] rounded-sm w-1/2"></div>
+      <div className="h-4 bg-[#E2E1DC] rounded-sm w-2/3"></div>
     </div>
-    <div className="h-[380px] bg-slate-100/50 dark:bg-gray-800/20 rounded-xl w-full flex items-center justify-center border border-slate-200 dark:border-white/5">
-      <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-gray-800/30 flex items-center justify-center">
-        <div className="w-4 h-4 bg-slate-300 dark:bg-gray-800/50 rounded-sm"></div>
-      </div>
+    <div className="w-full aspect-square bg-[#E2E1DC] rounded-[2px] border border-[#E2E1DC] flex items-center justify-center">
+      <span className="material-symbols-outlined text-[32px] text-[#BBBBB7] animate-spin">sync</span>
     </div>
+    <div className="h-4 bg-[#E2E1DC] rounded-sm w-1/3 pt-2"></div>
   </div>
 );
 
-function AudioSearch() {
+export default function AudioSearch() {
   const [isRecording, setIsRecording] = useState(false);
   const [transcription, setTranscription] = useState('');
   const [results, setResults] = useState(null);
@@ -30,32 +25,24 @@ function AudioSearch() {
   const [currentPage, setCurrentPage] = useState(1);
   const resultsPerPage = 6;
 
-  const canvasRef = useRef(null);
-  const [splineLoaded, setSplineLoaded] = useState(false);
+  // Real-time Waveform Animation Heights (28 bars)
+  const [barHeights, setBarHeights] = useState(Array(28).fill(6));
 
-  // Load Spline Scene Programmatically using @splinetool/runtime
   useEffect(() => {
-    let splineApp = null;
-    
-    if (canvasRef.current) {
-      splineApp = new Application(canvasRef.current);
-      splineApp.load('https://prod.spline.design/ZVPXbznt8G-AWbk9/scene.splinecode')
-        .then(() => {
-          // Force the background of the loaded scene to be transparent
-          splineApp.setBackgroundColor('transparent');
-          setSplineLoaded(true);
-        })
-        .catch((err) => {
-          console.error('Error loading Spline scene:', err);
-        });
+    let interval;
+    if (isRecording) {
+      interval = setInterval(() => {
+        setBarHeights(
+          Array(28)
+            .fill(0)
+            .map(() => Math.floor(Math.random() * 32) + 6)
+        );
+      }, 80);
+    } else {
+      setBarHeights(Array(28).fill(6));
     }
-
-    return () => {
-      if (splineApp) {
-        splineApp.dispose();
-      }
-    };
-  }, []);
+    return () => clearInterval(interval);
+  }, [isRecording]);
 
   const startRecording = async () => {
     try {
@@ -91,7 +78,7 @@ function AudioSearch() {
             setResults(data);
           } else {
             console.error('Error transcribing audio:', data.error);
-            setError(data.error);
+            setError(data.error || 'Failed to index sound.');
           }
         } catch (err) {
           console.error('Network error during transcription:', err);
@@ -115,207 +102,285 @@ function AudioSearch() {
     }
   };
 
+  const handleReset = () => {
+    setIsRecording(false);
+    setTranscription('');
+    setResults(null);
+    setError(null);
+    setCurrentPage(1);
+  };
+
   const paginatedResults = results
     ? results.ranked_results.slice((currentPage - 1) * resultsPerPage, currentPage * resultsPerPage)
     : [];
 
+  const totalPages = results ? Math.ceil(results.ranked_results.length / resultsPerPage) : 0;
+
   return (
-    <div className="min-h-screen flex flex-col items-center bg-slate-50 dark:bg-black p-6 pb-28 md:pb-6 md:pl-28 text-slate-800 dark:text-gray-100 relative overflow-hidden transition-all duration-300">
-      {/* Ambient background glows */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="absolute top-[-10%] left-[-10%] w-[50vw] aspect-square rounded-full bg-blue-200/40 dark:bg-blue-950/15 blur-[120px]"></div>
-        <div className="absolute bottom-[10%] right-[-10%] w-[50vw] aspect-square rounded-full bg-indigo-200/40 dark:bg-indigo-950/15 blur-[120px]"></div>
-      </div>
-
+    <div className="min-h-screen flex flex-col font-body-md text-primary antialiased bg-[#F7F6F3]">
       <Navbar />
-      
-      <div className="w-full max-w-6xl flex flex-col items-center z-10">
-        <h1 
-          className="text-4xl md:text-5xl font-semibold mb-6 text-slate-900 dark:text-white text-center" 
-          style={{ fontFamily: 'Zen Antique Soft, serif' }}
-        >
-          Audio Search
-        </h1>
-        
-        {/* Main Recording Panel */}
-        {!results && !isLoading && (
-          <div className="flex flex-col items-center justify-center w-full max-w-md bg-white/70 dark:bg-gray-900/20 backdrop-blur-md border border-slate-200 dark:border-white/5 p-8 rounded-2xl shadow-md dark:shadow-2xl mt-4">
-            
-            {/* 3D Spline Canvas Container */}
-            <div className="w-full aspect-square max-w-[280px] md:max-w-[340px] relative overflow-hidden rounded-full flex items-center justify-center bg-transparent">
-              {!splineLoaded && (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                </div>
-              )}
-              <canvas 
-                ref={canvasRef} 
-                className="absolute inset-0 w-full h-full object-cover scale-110"
-                style={{ background: 'transparent' }}
-              />
-            </div>
 
-            {/* Status indicators */}
-            <div className="mt-6 text-center">
-              {isRecording ? (
-                <div className="flex items-center justify-center space-x-2 text-red-500 animate-pulse">
-                  <span className="w-3 h-3 rounded-full bg-red-500 shadow-glow shadow-red-500/50"></span>
-                  <span className="font-semibold text-lg">Recording... Speak lyrics</span>
-                </div>
-              ) : (
-                <p className="text-slate-500 dark:text-gray-400 text-sm">
-                  Click below and speak or sing lyrics to search
-                </p>
-              )}
-            </div>
-
-            <div className="flex items-center justify-center gap-4 w-full mt-6">
-              <GlassButton
-                onClick={isRecording ? stopRecording : startRecording}
-                className={`flex-1 text-lg font-semibold text-white ${isRecording ? 'animate-pulse' : ''}`}
-                glassColor={isRecording ? 'rgba(220, 38, 38, 0.85)' : 'rgba(37, 99, 235, 0.85)'}
-              >
-                {isRecording ? 'Stop & Search' : 'Start Recording'}
-              </GlassButton>
-              <GlassButton
-                onClick={() => window.history.back()}
-                className="text-slate-800 dark:text-white font-medium"
-                glassColor="rgba(255, 255, 255, 0.15)"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Go Back
-              </GlassButton>
-            </div>
-          </div>
-        )}
-
-        {/* Loading Skeletons State */}
-        {isLoading && (
-          <div className="w-full max-w-4xl mt-6">
-            <div className="flex items-center space-x-3 mb-6 bg-slate-100/60 dark:bg-gray-950/20 backdrop-blur-sm border border-slate-200 dark:border-white/5 p-4 rounded-xl max-w-sm mx-auto shadow-md">
-              <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-              <p className="font-semibold text-blue-500">Transcribing & searching audio...</p>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-              {[...Array(resultsPerPage)].map((_, i) => (
-                <SongCardSkeleton key={i} />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Errors display */}
-        {error && (
-          <div className="mt-6 p-4 bg-red-50 dark:bg-red-950/20 backdrop-blur-sm border border-red-200 dark:border-red-900/30 text-red-700 dark:text-red-300 rounded-xl w-full max-w-md text-center shadow-md dark:shadow-2xl flex flex-col items-center">
-            <div className="flex items-center space-x-2">
-              <AlertCircle className="w-5 h-5 text-red-400 shrink-0" />
-              <span>{error}</span>
-            </div>
-            <button 
-              onClick={() => { setError(null); setResults(null); }}
-              className="mt-3 text-sm text-blue-600 dark:text-blue-400 hover:underline font-medium"
-            >
-              Try Again
-            </button>
-          </div>
-        )}
-
-        {/* Display Transcription */}
-        {transcription && !isLoading && (
-          <div className="mt-6 w-full max-w-2xl bg-white/70 dark:bg-gray-900/40 backdrop-blur-md border border-slate-200 dark:border-white/5 p-5 rounded-2xl shadow-md dark:shadow-xl flex items-center space-x-3">
-            <Headphones className="w-6 h-6 text-blue-500 dark:text-blue-400 shrink-0" />
-            <div>
-              <h2 className="text-xs font-semibold text-blue-500 uppercase tracking-wider">Voice Query:</h2>
-              <p className="text-xl font-medium text-slate-900 dark:text-white italic">"{transcription}"</p>
-            </div>
-          </div>
-        )}
-
-        {/* Results grid */}
-        {results && !isLoading && (
-          <div className="w-full max-w-6xl mt-6 animate-fadeIn">
-            <div className="flex flex-col sm:flex-row sm:items-baseline justify-between mb-6 pb-2 border-b border-slate-200 dark:border-white/5">
-              <h2 className="text-xl font-semibold text-blue-500">
-                Matched Songs:
-              </h2>
-              <button 
-                onClick={() => { setResults(null); setTranscription(''); }}
-                className="text-sm text-blue-600 dark:text-blue-400 hover:underline mt-2 sm:mt-0 font-medium flex items-center"
-              >
-                <Sparkles className="w-4 h-4 mr-1 text-blue-500 dark:text-blue-400" />
-                Perform another search
-              </button>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {paginatedResults.map(([details], index) => (
-                <div 
-                  key={index} 
-                  className="bg-white/70 dark:bg-gray-900/40 backdrop-blur-md border border-slate-200 dark:border-white/5 p-4 rounded-2xl shadow-md dark:shadow-xl text-slate-700 dark:text-gray-300 flex flex-col justify-between hover:border-blue-500/20 dark:hover:border-blue-500/30 transition-all duration-300 hover:shadow-lg dark:hover:shadow-blue-500/5 min-w-0 overflow-hidden"
-                >
-                  <div className="mb-2">
-                    <h4 className="text-xl font-bold text-slate-900 dark:text-white mb-2 line-clamp-1" title={details.name}>
-                      {details.name}
-                    </h4>
-                    <p className="text-sm text-slate-500 dark:text-gray-400 line-clamp-1" title={details.artists}>
-                      Artists: {details.artists}
+      <main className="flex-grow pt-[52px] pb-stack-lg flex justify-center w-full">
+        <div className="w-full max-w-container-max relative grid-bg px-margin-mobile md:px-0">
+          <div className="w-full md:grid md:grid-cols-12 min-h-full">
+            <div className="md:col-span-12 md:pl-[8.333%] md:pr-[8.333%] pt-16">
+              
+              {!results && !isLoading && !error ? (
+                /* RECORDING INITIAL PANEL STATE */
+                <div className="w-full max-w-[520px] mx-auto text-center flex flex-col items-center gap-stack-lg pt-12">
+                  <header className="flex flex-col gap-unit">
+                    <p className="font-label-caps text-label-caps text-secondary tracking-widest uppercase mb-unit">
+                      AUDIO QUERY
                     </p>
-                    <p className="text-sm text-slate-500 dark:text-gray-400 line-clamp-1" title={details.album_name}>
-                      Album: {details.album_name}
+                    <h1 className="font-display-lg-mobile md:font-display-lg text-primary tracking-tight">
+                      Hum it. <span className="italic font-light">We'll name it.</span>
+                    </h1>
+                    <p className="font-body-md text-[15px] text-secondary font-light max-w-[400px] mx-auto">
+                      Sing, hum, or describe a melody to query our neural lyric database.
                     </p>
+                  </header>
+
+                  {/* Visualizer mic trigger */}
+                  <div className={`w-full flex items-center justify-center py-8 relative ${isRecording ? 'listening-active' : ''}`}>
+                    <div className="relative w-64 h-64 flex items-center justify-center">
+                      {/* Outer rippling borders */}
+                      <div className="absolute inset-0 rounded-full border border-primary opacity-20 circle-ripple transition-all duration-300"></div>
+                      <div className="absolute inset-8 rounded-full border border-primary opacity-40 circle-ripple transition-all duration-300"></div>
+                      <div className="absolute inset-16 rounded-full border border-primary opacity-60 circle-ripple transition-all duration-300"></div>
+                      
+                      {/* Inner breathing dot trigger */}
+                      <button
+                        onClick={isRecording ? stopRecording : startRecording}
+                        className={`w-20 h-20 rounded-full bg-primary flex items-center justify-center relative cursor-pointer hover:scale-105 transition-transform duration-200 outline-none focus:outline-none ${isRecording ? 'bg-[#ba1a1a]' : ''}`}
+                        aria-label={isRecording ? "Stop recording" : "Start recording"}
+                      >
+                        <span className="material-symbols-outlined text-[36px] text-surface-bright flex items-center justify-center">
+                          {isRecording ? 'square' : 'mic'}
+                        </span>
+                      </button>
+                    </div>
                   </div>
-                  {details.spotify_id && (
-                    <div className="mt-2 rounded-xl overflow-hidden border border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-black/40 w-full min-w-0">
-                      <iframe
-                        src={`https://open.spotify.com/embed/track/${details.spotify_id.replace(/['"]+/g, '').trim()}`}
-                        width="100%"
-                        height="380"
-                        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                        className="rounded-xl shadow-inner border-0"
-                        style={{ border: 'none', overflow: 'hidden', minWidth: '100%', maxWidth: '100%' }}
-                        loading="lazy"
-                      ></iframe>
+
+                  {/* Waveform Visualization Bars */}
+                  <div className={`flex items-end justify-center gap-[3px] h-[40px] mb-4 w-full transition-opacity duration-200 ${isRecording ? 'opacity-100 listening-active' : 'opacity-30'}`}>
+                    {barHeights.map((h, i) => (
+                      <div
+                        key={i}
+                        className="waveform-bar"
+                        style={{ height: `${h}px` }}
+                      ></div>
+                    ))}
+                  </div>
+
+                  {/* Text action button */}
+                  <div>
+                    <button
+                      onClick={isRecording ? stopRecording : startRecording}
+                      className="px-6 h-[46px] border border-primary bg-transparent text-primary hover:bg-primary hover:text-white transition-all duration-100 font-label-caps text-label-caps rounded-sm uppercase tracking-wider flex items-center justify-center"
+                    >
+                      {isRecording ? 'Stop & Search' : 'Start Listening'}
+                    </button>
+                  </div>
+                </div>
+              ) : null}
+
+              {/* Loading State */}
+              {isLoading && (
+                <div>
+                  <div className="flex justify-between items-end pb-4 hairline-b mb-6">
+                    <h1 className="font-headline-md text-[20px] text-primary">Transcribing & indexing audio...</h1>
+                    <span className="font-metadata text-metadata text-secondary">Neural match in progress</span>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {[...Array(resultsPerPage)].map((_, i) => (
+                      <SongCardSkeleton key={i} />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Error State */}
+              {error && !isLoading && (
+                <div className="w-full max-w-[520px] mx-auto text-center flex flex-col items-center gap-6 pt-12">
+                  <header className="flex flex-col gap-unit">
+                    <p className="font-label-caps text-label-caps text-secondary tracking-widest uppercase mb-unit">
+                      SYSTEM ERROR
+                    </p>
+                    <h1 className="font-display-lg-mobile md:font-display-lg text-primary tracking-tight">
+                      Unable to <span className="italic font-light">transcribe</span>.
+                    </h1>
+                  </header>
+                  <div className="w-full p-6 border border-error bg-[#ffdad6] text-error rounded-sm text-center">
+                    <p className="font-body-md text-body-md font-semibold mb-2">{error}</p>
+                    <button
+                      onClick={handleReset}
+                      className="mt-2 text-sm underline hover:text-primary transition-colors font-metadata"
+                    >
+                      Reset and Try Again
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Transcription Results card grid */}
+              {results && !isLoading && (
+                <div>
+                  <header className="flex flex-col gap-1 pb-4 hairline-b mb-8">
+                    <p className="font-label-caps text-label-caps text-secondary tracking-widest uppercase">
+                      VOICE TRANSCRIBED
+                    </p>
+                    <h1 className="font-display-lg-mobile md:font-headline-md text-primary italic font-light tracking-tight max-w-[800px] leading-tight">
+                      "{transcription || "Unknown Humming"}"
+                    </h1>
+                    <div className="flex justify-between items-baseline mt-4 w-full">
+                      <span className="font-metadata text-metadata text-secondary">
+                        Found {results.ranked_results.length} matches
+                      </span>
+                      <button
+                        onClick={handleReset}
+                        className="font-metadata text-[14px] text-primary hover:text-secondary underline flex items-center gap-1"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">restart_alt</span>
+                        New Audio Search
+                      </button>
+                    </div>
+                  </header>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {paginatedResults.map(([details], index) => {
+                      const cleanSpotifyId = details.spotify_id
+                        ? details.spotify_id.replace(/['"]+/g, '').trim()
+                        : '';
+
+                      return (
+                        <div
+                          key={index}
+                          className="song-card hairline-all p-4 flex flex-col gap-4 transition-colors duration-100 group rounded-[4px] bg-[#F7F6F3]"
+                        >
+                          <div className="flex flex-col gap-1 min-h-[72px]">
+                            <h3
+                              className="font-headline-md text-[20px] text-primary leading-tight truncate"
+                              title={details.name}
+                            >
+                              {details.name}
+                            </h3>
+                            <p className="font-metadata text-metadata text-secondary truncate">
+                              Artists: {details.artists}
+                            </p>
+                            <p className="font-metadata text-metadata text-secondary truncate">
+                              Album: {details.album_name}
+                            </p>
+                          </div>
+
+                          {cleanSpotifyId ? (
+                            <div className="w-full aspect-square bg-[#E2E1DC] relative overflow-hidden rounded-[2px] border border-[#E2E1DC]">
+                              <iframe
+                                src={`https://open.spotify.com/embed/track/${cleanSpotifyId}`}
+                                width="100%"
+                                height="100%"
+                                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                                className="border-0 w-full h-full object-cover"
+                                style={{ border: 'none', overflow: 'hidden' }}
+                                loading="lazy"
+                              ></iframe>
+                            </div>
+                          ) : (
+                            <div className="w-full aspect-square bg-[#E2E1DC] relative overflow-hidden rounded-[2px] border border-[#E2E1DC] flex items-center justify-center">
+                              <span className="material-symbols-outlined text-[48px] text-secondary">music_note</span>
+                            </div>
+                          )}
+
+                          <div className="flex items-center justify-between pt-2">
+                            {cleanSpotifyId ? (
+                              <a
+                                href={`https://open.spotify.com/track/${cleanSpotifyId}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-2 font-metadata text-[14px] text-primary hover:text-secondary transition-colors"
+                              >
+                                <span className="material-symbols-outlined text-[20px]">open_in_new</span>
+                                Open on Spotify
+                              </a>
+                            ) : (
+                              <span className="font-metadata text-[14px] text-secondary">No Spotify Link</span>
+                            )}
+                            <div className="flex items-center gap-3">
+                              {cleanSpotifyId && (
+                                <a
+                                  href={`https://open.spotify.com/track/${cleanSpotifyId}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="w-[36px] h-[36px] rounded-full border border-[#111110] flex items-center justify-center text-primary hover:bg-[#111110] hover:text-[#F7F6F3] transition-colors"
+                                >
+                                  <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+                                    play_arrow
+                                  </span>
+                                </a>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Pagination */}
+                  {totalPages > 1 && (
+                    <div className="mt-10 flex items-center gap-2">
+                      <button
+                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                        className="w-[28px] h-[28px] hairline-all flex items-center justify-center text-secondary hover:text-primary hover:border-primary disabled:opacity-30 disabled:pointer-events-none transition-colors"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">chevron_left</span>
+                      </button>
+                      
+                      {[...Array(totalPages)].map((_, i) => {
+                        const pageNum = i + 1;
+                        const isCurrent = currentPage === pageNum;
+                        return (
+                          <button
+                            key={pageNum}
+                            onClick={() => setCurrentPage(pageNum)}
+                            className={`w-[28px] h-[28px] flex items-center justify-center font-metadata text-metadata transition-colors ${
+                              isCurrent
+                                ? 'border-ink bg-primary text-surface font-semibold'
+                                : 'hairline-all text-secondary hover:text-primary hover:border-primary'
+                            }`}
+                          >
+                            {pageNum}
+                          </button>
+                        );
+                      })}
+
+                      <button
+                        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                        disabled={currentPage === totalPages}
+                        className="w-[28px] h-[28px] hairline-all flex items-center justify-center text-secondary hover:text-primary hover:border-primary disabled:opacity-30 disabled:pointer-events-none transition-colors"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+                      </button>
                     </div>
                   )}
                 </div>
-              ))}
-            </div>
+              )}
 
-            {/* Pagination Controls */}
-            {results.ranked_results.length > resultsPerPage && (
-              <div className="flex justify-between items-center mt-8">
-                <button
-                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                  disabled={currentPage === 1}
-                  className="px-5 py-2.5 bg-white/70 dark:bg-gray-900/40 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-white rounded-xl hover:bg-slate-50 dark:hover:bg-gray-800 disabled:opacity-30 disabled:pointer-events-none transition-all duration-200"
-                >
-                  Previous
-                </button>
-                <span className="text-slate-500 dark:text-gray-400 text-sm font-medium">
-                  Page {currentPage} of {Math.ceil(results.ranked_results.length / resultsPerPage)}
-                </span>
-                <button
-                  onClick={() =>
-                    setCurrentPage((prev) =>
-                      Math.min(prev + 1, Math.ceil(results.ranked_results.length / resultsPerPage))
-                    )
-                  }
-                  disabled={currentPage === Math.ceil(results.ranked_results.length / resultsPerPage)}
-                  className="px-5 py-2.5 bg-white/70 dark:bg-gray-900/40 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-white rounded-xl hover:bg-slate-50 dark:hover:bg-gray-800 disabled:opacity-30 disabled:pointer-events-none transition-all duration-200"
-                >
-                  Next
-                </button>
-              </div>
-            )}
+            </div>
           </div>
-        )}
-      </div>
-      
-      <footer className="mt-16 text-center text-slate-400 dark:text-gray-600 text-sm z-10">
-        <p>&copy; 2024 Lyrica. All rights reserved.</p>
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="w-full py-stack-md px-margin-mobile md:px-margin-desktop flex flex-col md:flex-row justify-between items-center max-w-container-max mx-auto bg-surface border-t border-[#E2E1DC] mt-auto">
+        <span className="font-metadata text-metadata text-secondary mb-4 md:mb-0">
+          © 2024 Lyricist Editorial. All rights reserved.
+        </span>
+        <div className="flex space-x-6">
+          <a className="font-metadata text-metadata text-secondary hover:underline transition-all" href="#">Privacy</a>
+          <a className="font-metadata text-metadata text-secondary hover:underline transition-all" href="#">Terms</a>
+          <a className="font-metadata text-metadata text-secondary hover:underline transition-all" href="#">Archive</a>
+        </div>
       </footer>
     </div>
   );
 }
-
-export default AudioSearch;

@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Music, Link as LinkIcon, Users, Disc, FileText, CheckCircle } from 'lucide-react';
 import Navbar from './components/navbar';
-import { GlassButton } from './components/GlassButton';
 
 export default function AddSongForm() {
   const [formData, setFormData] = useState({
@@ -82,7 +80,6 @@ export default function AddSongForm() {
     }
   };
 
-  // Automatically dismiss the success toast after 4 seconds
   useEffect(() => {
     if (success) {
       const timer = setTimeout(() => {
@@ -93,151 +90,146 @@ export default function AddSongForm() {
   }, [success]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center bg-slate-50 dark:bg-black p-6 pb-28 md:pb-6 md:pl-28 text-slate-800 dark:text-gray-100 relative overflow-hidden transition-all duration-300">
-      {/* Ambient background glows */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="absolute top-[-10%] left-[-10%] w-[50vw] aspect-square rounded-full bg-blue-200/40 dark:bg-blue-950/15 blur-[120px]"></div>
-        <div className="absolute bottom-[10%] right-[-10%] w-[50vw] aspect-square rounded-full bg-indigo-200/40 dark:bg-indigo-950/15 blur-[120px]"></div>
-      </div>
-
+    <div className="min-h-screen flex flex-col font-body-md text-primary antialiased bg-[#F7F6F3]">
       <Navbar />
-      
-      <div className="w-full max-w-2xl flex flex-col justify-center flex-grow z-10">
-        <h1 
-          className="text-4xl font-semibold mb-6 text-slate-900 dark:text-white text-center mt-4" 
-          style={{ fontFamily: 'Zen Antique Soft, serif' }}
-        >
-          Add New Song
-        </h1>
 
-        <form 
-          onSubmit={handleSubmit} 
-          className="w-full bg-white/70 dark:bg-gray-900/40 backdrop-blur-md border border-slate-200 dark:border-white/5 p-6 sm:p-8 rounded-2xl shadow-md dark:shadow-2xl transition-all"
-        >
-          <div className="mb-4">
-            <label htmlFor="name" className="text-sm font-medium text-slate-700 dark:text-gray-300 mb-2 flex items-center">
-              <Music className="w-4 h-4 mr-2 text-blue-500" />
-              Song Title
-            </label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
+      <main className="flex-grow pt-[100px] pb-stack-lg px-margin-mobile md:px-margin-desktop flex justify-center items-center">
+        <div className="w-full max-w-[520px] mx-auto text-left flex flex-col gap-stack-md mt-6">
+          <header className="flex flex-col gap-unit mb-2">
+            <p className="font-label-caps text-label-caps text-secondary tracking-widest uppercase mb-unit">DATABASE INDEXING</p>
+            <h1 className="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-primary tracking-tight">
+              Add new <span className="italic font-light">song</span>.
+            </h1>
+            <div className="w-[32px] h-[1px] bg-primary mt-2"></div>
+          </header>
+
+          <form onSubmit={handleSubmit} className="flex flex-col gap-5 w-full">
+            <div className="flex flex-col gap-2">
+              <label htmlFor="name" className="font-label-caps text-label-caps text-secondary uppercase">
+                Song Title
+              </label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+                disabled={isLoading}
+                placeholder="e.g. Bohemian Rhapsody"
+                className="w-full bg-[#fdf8f7] hairline-all py-3 px-4 font-body-md text-primary placeholder-[#BBBBB7] rounded-sm focus:border-primary focus:ring-0 outline-none transition-colors duration-200"
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label htmlFor="spotifyLink" className="font-label-caps text-label-caps text-secondary uppercase">
+                Spotify Link
+              </label>
+              <input
+                type="url"
+                id="spotifyLink"
+                name="spotifyLink"
+                value={formData.spotifyLink}
+                onChange={handleChange}
+                required
+                disabled={isLoading}
+                placeholder="e.g. https://open.spotify.com/track/..."
+                className="w-full bg-[#fdf8f7] hairline-all py-3 px-4 font-body-md text-primary placeholder-[#BBBBB7] rounded-sm focus:border-primary focus:ring-0 outline-none transition-colors duration-200"
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label htmlFor="artists" className="font-label-caps text-label-caps text-secondary uppercase">
+                Artists (separated by commas)
+              </label>
+              <input
+                type="text"
+                id="artists"
+                name="artists"
+                value={formData.artists}
+                onChange={handleChange}
+                required
+                disabled={isLoading}
+                placeholder="e.g. Queen"
+                className="w-full bg-[#fdf8f7] hairline-all py-3 px-4 font-body-md text-primary placeholder-[#BBBBB7] rounded-sm focus:border-primary focus:ring-0 outline-none transition-colors duration-200"
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label htmlFor="album" className="font-label-caps text-label-caps text-secondary uppercase">
+                Album Name
+              </label>
+              <input
+                type="text"
+                id="album"
+                name="album"
+                value={formData.album}
+                onChange={handleChange}
+                required
+                disabled={isLoading}
+                placeholder="e.g. A Night at the Opera"
+                className="w-full bg-[#fdf8f7] hairline-all py-3 px-4 font-body-md text-primary placeholder-[#BBBBB7] rounded-sm focus:border-primary focus:ring-0 outline-none transition-colors duration-200"
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label htmlFor="lyrics" className="font-label-caps text-label-caps text-secondary uppercase">
+                Lyrics
+              </label>
+              <textarea
+                id="lyrics"
+                name="lyrics"
+                value={formData.lyrics}
+                onChange={handleChange}
+                required
+                disabled={isLoading}
+                placeholder="Paste song lyrics here..."
+                className="w-full bg-[#fdf8f7] hairline-all py-3 px-4 font-body-md text-primary placeholder-[#BBBBB7] rounded-sm focus:border-primary focus:ring-0 outline-none transition-colors duration-200 min-h-[120px]"
+                rows="4"
+              />
+            </div>
+
+            <button
+              type="submit"
               disabled={isLoading}
-              placeholder="e.g. Bohemian Rhapsody"
-              className="w-full p-3 bg-slate-50/50 dark:bg-gray-900/40 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-500/30 placeholder-slate-400 dark:placeholder-gray-500 transition-all disabled:opacity-50"
-            />
-          </div>
+              className="w-full h-[48px] btn-default rounded-sm font-label-caps text-label-caps uppercase tracking-wider flex items-center justify-center gap-2 border border-primary bg-transparent text-primary hover:bg-primary hover:text-white transition-all duration-100"
+            >
+              {isLoading ? (
+                <>
+                  <span className="material-symbols-outlined animate-spin text-[20px]">sync</span>
+                  <span>Indexing song...</span>
+                </>
+              ) : (
+                <span>Add Song to Index</span>
+              )}
+            </button>
+          </form>
 
-          <div className="mb-4">
-            <label htmlFor="spotifyLink" className="text-sm font-medium text-slate-700 dark:text-gray-300 mb-2 flex items-center">
-              <LinkIcon className="w-4 h-4 mr-2 text-blue-500" />
-              Spotify Link
-            </label>
-            <input
-              type="url"
-              id="spotifyLink"
-              name="spotifyLink"
-              value={formData.spotifyLink}
-              onChange={handleChange}
-              required
-              disabled={isLoading}
-              placeholder="e.g. https://open.spotify.com/track/..."
-              className="w-full p-3 bg-slate-50/50 dark:bg-gray-900/40 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-500/30 placeholder-slate-400 dark:placeholder-gray-500 transition-all disabled:opacity-50"
-            />
-          </div>
+          {error && (
+            <div className="mt-4 p-4 border border-error bg-[#ffdad6] text-error rounded-sm text-center font-metadata text-metadata">
+              {error}
+            </div>
+          )}
+        </div>
+      </main>
 
-          <div className="mb-4">
-            <label htmlFor="artists" className="text-sm font-medium text-slate-700 dark:text-gray-300 mb-2 flex items-center">
-              <Users className="w-4 h-4 mr-2 text-blue-500" />
-              Artists (separated by commas)
-            </label>
-            <input
-              type="text"
-              id="artists"
-              name="artists"
-              value={formData.artists}
-              onChange={handleChange}
-              required
-              disabled={isLoading}
-              placeholder="e.g. Queen"
-              className="w-full p-3 bg-slate-50/50 dark:bg-gray-900/40 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-500/30 placeholder-slate-400 dark:placeholder-gray-500 transition-all disabled:opacity-50"
-            />
-          </div>
-
-          <div className="mb-4">
-            <label htmlFor="album" className="text-sm font-medium text-slate-700 dark:text-gray-300 mb-2 flex items-center">
-              <Disc className="w-4 h-4 mr-2 text-blue-500" />
-              Album Name
-            </label>
-            <input
-              type="text"
-              id="album"
-              name="album"
-              value={formData.album}
-              onChange={handleChange}
-              required
-              disabled={isLoading}
-              placeholder="e.g. A Night at the Opera"
-              className="w-full p-3 bg-slate-50/50 dark:bg-gray-900/40 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-500/30 placeholder-slate-400 dark:placeholder-gray-500 transition-all disabled:opacity-50"
-            />
-          </div>
-
-          <div className="mb-6">
-            <label htmlFor="lyrics" className="text-sm font-medium text-slate-700 dark:text-gray-300 mb-2 flex items-center">
-              <FileText className="w-4 h-4 mr-2 text-blue-500" />
-              Lyrics
-            </label>
-            <textarea
-              id="lyrics"
-              name="lyrics"
-              value={formData.lyrics}
-              onChange={handleChange}
-              required
-              disabled={isLoading}
-              placeholder="Paste song lyrics here..."
-              className="w-full p-3 bg-slate-50/50 dark:bg-gray-900/40 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-500/30 placeholder-slate-400 dark:placeholder-gray-500 transition-all disabled:opacity-50"
-              rows="4"
-            />
-          </div>
-
-          <GlassButton
-            type="submit"
-            className="w-full font-semibold text-white"
-            glassColor="rgba(37, 99, 235, 0.85)"
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <>
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                <span>Indexing song...</span>
-              </>
-            ) : (
-              <span>Add Song to Index</span>
-            )}
-          </GlassButton>
-        </form>
-
-        {error && (
-          <div className="mt-6 p-4 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/50 text-red-700 dark:text-red-300 rounded-xl text-center shadow-md dark:shadow-lg">
-            {error}
-          </div>
-        )}
-      </div>
-
-      {/* Floating Modern Toast Notification */}
+      {/* Brutalist Toast Notification */}
       {success && (
-        <div className="fixed top-6 left-1/2 transform -translate-x-1/2 px-6 py-4 bg-green-600 border border-green-500/30 text-white rounded-xl shadow-2xl z-50 flex items-center space-x-2 animate-bounce">
-          <CheckCircle className="w-5 h-5 text-white" />
-          <span className="font-semibold text-base">Song successfully added and indexed!</span>
+        <div className="fixed top-6 left-1/2 transform -translate-x-1/2 px-6 py-4 bg-[#fdf8f7] border-heavy border-primary text-primary rounded-sm shadow-xl z-50 flex items-center gap-3 animate-bounce">
+          <span className="material-symbols-outlined text-[20px] text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+          <span className="font-label-caps text-[11px] tracking-wider uppercase">Song indexed successfully!</span>
         </div>
       )}
-      
-      <footer className="mt-16 text-center text-slate-400 dark:text-gray-600 text-sm">
-        <p>&copy; 2024 Lyrica. All rights reserved.</p>
+
+      {/* Footer */}
+      <footer className="w-full py-stack-md px-margin-mobile md:px-margin-desktop flex flex-col md:flex-row justify-between items-center max-w-container-max mx-auto border-t border-[#E2E1DC] bg-surface mt-auto">
+        <span className="font-label-caps text-label-caps text-primary">Lyricist</span>
+        <div className="flex gap-stack-md mt-stack-md md:mt-0">
+          <a className="font-metadata text-metadata text-secondary hover:underline" href="#">Privacy</a>
+          <a className="font-metadata text-metadata text-secondary hover:underline" href="#">Terms</a>
+          <a className="font-metadata text-metadata text-secondary hover:underline" href="#">Archive</a>
+        </div>
+        <span className="font-metadata text-metadata text-secondary mt-stack-md md:mt-0">© 2024 Lyricist Editorial. All rights reserved.</span>
       </footer>
     </div>
   );
